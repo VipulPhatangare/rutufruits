@@ -3,7 +3,7 @@ module.exports = {
         {
             name: "rutufruits-website",
             script: "node_modules/next/dist/bin/next",
-            args: "start -p 3000",
+            args: "start -p 8000",
             instances: "max",
             exec_mode: "cluster",
             env: {
