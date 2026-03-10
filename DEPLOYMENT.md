@@ -93,7 +93,64 @@ sudo systemctl restart nginx
 Install Certbot and get a free Let's Encrypt SSL certificate for `https://`:
 ```bash
 sudo apt install certbot python3-certbot-nginx -y
-sudo certbot --nginx -d rutufruits.in -d www.rutufruits.in
+
+# Create the webroot directory for Certbot challenges
+sudo mkdir -p /var/www/certbot
+
+# Request the certificate
+sudo certbot certonly --webroot -w /var/www/certbot -d rutufruits.in -d www.rutufruits.in
 ```
 
-Follow the prompts. Choose "Yes" to redirect all traffic to HTTPS. That's it! Your site is now live at `https://rutufruits.in`.
+Follow the prompts.
+
+After the certificate is generated, update your Nginx configuration one last time to use it:
+
+```bash
+sudo nano /etc/nginx/sites-available/rutufruits.in
+```
+
+Update your config to look like this (Certbot handles the HTTPS redirection now):
+
+```nginx
+server {
+    listen 80;
+    server_name rutufruits.in www.rutufruits.in;
+
+    # Allow Certbot to authenticate via webroot
+    location ~ /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+        allow all;
+    }
+
+    # Redirect to HTTPS
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name rutufruits.in www.rutufruits.in;
+
+    ssl_certificate /etc/letsencrypt/live/rutufruits.in/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/rutufruits.in/privkey.pem;
+
+    location / {
+        proxy_pass http://localhost:8000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
+```
+
+```bash
+sudo nginx -t
+sudo systemctl restart nginx
+```
+
+That's it! Your site is now live at `https://rutufruits.in`.
