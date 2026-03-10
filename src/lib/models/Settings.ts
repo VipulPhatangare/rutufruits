@@ -8,7 +8,7 @@ export interface ISettings extends Document {
 
 const SettingsSchema = new Schema<ISettings>(
   {
-    whatsappNumber: { type: String, required: true, default: "91XXXXXXXXXX" },
+    whatsappNumber: { type: String, required: true, default: "918485844450" },
     whatsappMessageTemplate: {
       type: String,
       default:

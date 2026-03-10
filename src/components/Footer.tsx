@@ -44,6 +44,8 @@ export default function Footer({ whatsappNumber }: FooterProps) {
             {[
               { label: "Home", href: "/" },
               { label: "Privacy Policy", href: "/privacy-policy" },
+              { label: "Shipping & Returns", href: "/shipping-returns" },
+              { label: "Terms & Conditions", href: "/terms-and-conditions" },
               { label: "Contact", href: "/contact" },
               { label: "Admin", href: "/admin" },
             ].map((link) => (

@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Footer from "@/components/Footer";
 
-const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "91XXXXXXXXXX";
+const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "918485844450";
 
 export default function ContactPage() {
   const displayNumber = whatsappNumber.startsWith("91")

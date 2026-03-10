@@ -10,7 +10,7 @@ export async function GET() {
     if (!settings) {
       // Create default settings on first request
       const created = await Settings.create({
-        whatsappNumber: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "91XXXXXXXXXX",
+        whatsappNumber: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "918485844450",
         whatsappMessageTemplate:
           "Hi RutuFruits! 🥭\nI'd like to order:\n• Type: [Ratnagiri Hapus / Devgad Hapus]\n• Quantity: ___ Dozen\n• Name: \n• Delivery Address: ",
       });
