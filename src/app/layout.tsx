@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import Providers from "./Providers";
 import "./globals.css";
+import Chatbot from "../components/Chatbot";
 
 const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
@@ -39,6 +40,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${cormorant.variable} ${dmSans.variable} antialiased`} suppressHydrationWarning>
         <Providers>{children}</Providers>
+        <Chatbot />
       </body>
     </html>
   );
