@@ -3,7 +3,12 @@
 import { useState, useEffect, useRef } from "react";
 
 export default function Chatbot() {
-    const [isOpen, setIsOpen] = useState(true);
+    const [isOpen, setIsOpen] = useState(false);
+
+    // Open chatbot after mount (avoids SSR/hydration mismatch)
+    useEffect(() => {
+        setIsOpen(true);
+    }, []);
     const [messages, setMessages] = useState<{ role: "user" | "bot"; content: string }[]>([
         { role: "bot", content: "Hi there! I'm the RutuFruits assistant. How can I help you today?" }
     ]);
