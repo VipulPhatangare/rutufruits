@@ -62,6 +62,12 @@ server {
     listen 80;
     server_name rutufruits.in www.rutufruits.in;
 
+    # Allow Certbot to authenticate via webroot
+    location ~ /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+        allow all;
+    }
+
     location / {
         proxy_pass http://localhost:8000;
         proxy_http_version 1.1;
