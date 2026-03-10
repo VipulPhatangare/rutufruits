@@ -594,7 +594,7 @@ export default async function ProductDetailPage({
         </div>
       </main>
 
-      <Footer whatsappNumber={whatsappNumber} />
+      <Footer />
     </>
   );
 }

@@ -341,7 +341,7 @@ export default function ShippingReturnsPage() {
         </div>
       </main>
 
-      <Footer whatsappNumber={whatsappNumber} />
+      <Footer />
     </>
   );
 }

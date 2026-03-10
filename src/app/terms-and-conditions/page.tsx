@@ -226,7 +226,7 @@ export default function TermsAndConditionsPage() {
         </div>
       </main>
 
-      <Footer whatsappNumber={whatsappNumber} />
+      <Footer />
     </>
   );
 }

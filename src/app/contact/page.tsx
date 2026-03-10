@@ -284,7 +284,7 @@ export default function ContactPage() {
         </div>
       </main>
 
-      <Footer whatsappNumber={whatsappNumber} />
+      <Footer />
     </>
   );
 }

@@ -140,7 +140,7 @@ export default async function HomePage() {
       <ProvenanceSection />
 
       {/* 6. Footer */}
-      <Footer whatsappNumber={settings.whatsappNumber} />
+      <Footer />
     </main>
   );
 }

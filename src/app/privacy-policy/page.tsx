@@ -337,7 +337,7 @@ export default function PrivacyPolicyPage() {
         </div>
       </main>
 
-      <Footer whatsappNumber={whatsappNumber} />
+      <Footer />
     </>
   );
 }

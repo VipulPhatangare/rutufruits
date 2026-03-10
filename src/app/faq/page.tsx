@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Metadata } from "next";
 import FAQAccordion from "../../components/FAQAccordion";
+import Footer from "../../components/Footer";
 
 export const metadata: Metadata = {
     title: "Frequently Asked Questions — Friends of Farmers",
@@ -66,7 +67,36 @@ export default function FAQPage() {
     const allFaqs = faqs.flatMap(section => section.items);
 
     return (
-        <main className="min-h-screen pt-24 pb-20 px-6" style={{ backgroundColor: "var(--ivory)" }}>
+        <>
+            {/* Nav */}
+            <header
+                className="px-6 py-4 border-b"
+                style={{ backgroundColor: "var(--cream-white)", borderColor: "var(--parchment)" }}
+            >
+                <div className="max-w-4xl mx-auto flex items-center justify-between">
+                    <Link
+                        href="/"
+                        className="text-2xl font-light"
+                        style={{ fontFamily: "var(--font-cormorant), 'Cormorant Garamond', serif" }}
+                    >
+                        <span style={{ color: "var(--forest)" }}>Rutu</span>
+                        <span style={{ color: "var(--gold)" }}>Fruits</span>
+                    </Link>
+                    <Link
+                        href="/"
+                        className="text-sm"
+                        style={{
+                            color: "var(--warm-grey)",
+                            fontFamily: "var(--font-dm-sans), 'DM Sans', sans-serif",
+                            fontWeight: 300,
+                        }}
+                    >
+                        ← Back to Home
+                    </Link>
+                </div>
+            </header>
+
+            <main className="min-h-screen py-16 pb-20 px-6" style={{ backgroundColor: "var(--ivory)" }}>
             <div className="max-w-4xl mx-auto">
                 <div className="mb-12 text-center">
                     <h1
@@ -119,5 +149,7 @@ export default function FAQPage() {
                 </div>
             </div>
         </main>
+        <Footer />
+        </>
     );
 }
