@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 
 export default function Chatbot() {
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(true);
     const [messages, setMessages] = useState<{ role: "user" | "bot"; content: string }[]>([
         { role: "bot", content: "Hi there! I'm the RutuFruits assistant. How can I help you today?" }
     ]);
@@ -118,18 +118,16 @@ export default function Chatbot() {
             <div className="fixed bottom-6 right-6 z-50">
                 <button
                     onClick={() => setIsOpen(!isOpen)}
-                    className="flex items-center justify-center w-14 h-14 rounded-full shadow-xl transition-transform hover:scale-105 active:scale-95"
+                    className="flex items-center justify-center w-20 h-20 rounded-full shadow-2xl transition-transform hover:scale-110 active:scale-95"
                     style={{ backgroundColor: "var(--forest)", color: "var(--ivory)" }}
                     aria-label="Toggle Chatbot"
                 >
                     {isOpen ? (
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     ) : (
-                        <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                        </svg>
+                        <span className="text-4xl leading-none select-none" role="img" aria-label="mango">🥭</span>
                     )}
                 </button>
             </div>
