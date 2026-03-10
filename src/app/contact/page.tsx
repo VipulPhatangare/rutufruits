@@ -118,9 +118,9 @@ export default function ContactPage() {
               {[
                 { label: "Business", value: "RutuFruits" },
                 { label: "WhatsApp", value: displayNumber },
-                { label: "Email", value: "hello@rutufruits.in" },
+                { label: "Email", value: "support@rutufruits.in" },
                 { label: "Location", value: "Pune, Maharashtra, India" },
-                { label: "Hours", value: "Mon–Sat, 9am–7pm" },
+                { label: "Hours", value: "Mon–Sat, 10am–7pm" },
               ].map((row) => (
                 <div key={row.label} className="flex gap-4">
                   <span
