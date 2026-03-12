@@ -27,5 +27,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   pages: {
     signIn: "/admin/login",
   },
+  session: {
+    strategy: "jwt",
+    maxAge: 60 * 60 * 24 * 30, // 30 days
+  },
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) token.id = user.id;
+      return token;
+    },
+    async session({ session, token }) {
+      if (token && session.user) {
+        (session.user as { id?: string }).id = token.id as string;
+      }
+      return session;
+    },
+  },
+  trustHost: true,
   secret: process.env.NEXTAUTH_SECRET,
 });

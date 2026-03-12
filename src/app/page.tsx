@@ -62,7 +62,7 @@ async function getPageData(): Promise<{
   }
 }
 
-export const revalidate = 60;
+export const revalidate = 0;
 
 export default async function HomePage() {
   const { products, settings } = await getPageData();

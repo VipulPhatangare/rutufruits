@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Settings } from "@/lib/models/Settings";
 import { auth } from "@/auth";
@@ -40,6 +41,10 @@ export async function PUT(request: NextRequest) {
       { whatsappNumber, whatsappMessageTemplate, updatedAt: new Date() },
       { new: true, upsert: true }
     );
+
+    // Bust page cache so WhatsApp number/message updates appear immediately
+    revalidatePath("/");
+    revalidatePath("/products/[slug]", "page");
 
     return NextResponse.json(settings);
   } catch {

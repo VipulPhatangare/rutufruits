@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Product } from "@/lib/models/Product";
 import { auth } from "@/auth";
@@ -6,7 +7,10 @@ import { auth } from "@/auth";
 export async function GET() {
   try {
     await connectToDatabase();
-    const products = await Product.find({ available: true }).lean();
+    const session = await auth();
+    // Admin sees all products (including unavailable); public sees only available
+    const query = session ? {} : { available: true };
+    const products = await Product.find(query).lean();
     return NextResponse.json(products);
   } catch {
     return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 });
@@ -19,18 +23,23 @@ export async function PUT(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { id, type, pricePerDozen, available, description } = body;
+    const { _id, id, type, pricePerDozen, available, description } = body;
+    const productId = _id || id;
 
-    if (!id) return NextResponse.json({ error: "Product ID required" }, { status: 400 });
+    if (!productId) return NextResponse.json({ error: "Product ID required" }, { status: 400 });
 
     await connectToDatabase();
     const updated = await Product.findByIdAndUpdate(
-      id,
+      productId,
       { type, pricePerDozen, available, description, updatedAt: new Date() },
       { new: true }
     );
 
     if (!updated) return NextResponse.json({ error: "Product not found" }, { status: 404 });
+
+    // Bust page cache so changes appear on the site immediately
+    revalidatePath("/");
+    revalidatePath("/products/[slug]", "page");
 
     return NextResponse.json(updated);
   } catch {
@@ -74,6 +83,8 @@ export async function POST(request: NextRequest) {
               "GI-tagged Devgad Alphonso. Coastal Konkan sea breeze gives a distinctly floral, honey-sweet aroma. Considered the rarest grade by connoisseurs.",
           },
         ]);
+        revalidatePath("/");
+        revalidatePath("/products/[slug]", "page");
         return NextResponse.json({ seeded: true });
       }
       return NextResponse.json({ seeded: false, message: "Products already exist" });

@@ -98,7 +98,7 @@ function getMangoDetails(slug: string) {
   return null;
 }
 
-export const revalidate = 60;
+export const revalidate = 0;
 
 export default async function ProductDetailPage({
   params,
