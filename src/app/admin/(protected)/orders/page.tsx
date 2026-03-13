@@ -4,17 +4,26 @@ import { useEffect, useState } from "react";
 
 interface Order {
   _id: string;
+  orderId: string;
   productType: string;
   quantity: number;
   name: string;
+  email?: string;
   phone: string;
   address: string;
   totalAmount: number;
+  pricePerDozen: number;
+  subtotal: number;
+  tax: number;
+  deliveryCharges: number;
+  distance: number;
   paymentMethod: "cod" | "razorpay";
   paymentStatus: "pending" | "paid" | "failed";
   orderStatus: "new" | "confirmed" | "dispatched" | "delivered" | "cancelled";
+  orderStatusLabel?: string;
   freeDelivery: boolean;
   razorpayPaymentLinkUrl?: string;
+  paymentId?: string;
   createdAt: string;
 }
 
@@ -31,6 +40,10 @@ const statusColor: Record<string, string> = {
   paid: "#27ae60",
   failed: "#c0392b",
 };
+
+function formatCurrency(value: number) {
+  return `₹${Number(value || 0).toLocaleString("en-IN")}`;
+}
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -69,7 +82,7 @@ export default function OrdersPage() {
       .finally(() => setUpdating(null));
   }
 
-  const total = orders.reduce((sum, o) => sum + o.totalAmount, 0);
+  const total = orders.reduce((sum, o) => sum + Number(o.totalAmount || 0), 0);
   const newCount = orders.filter((o) => o.orderStatus === "new").length;
 
   return (
@@ -184,6 +197,18 @@ export default function OrdersPage() {
                   >
                     {order.phone}
                   </p>
+                  {order.email && (
+                    <p
+                      className="text-sm"
+                      style={{
+                        color: "var(--warm-grey)",
+                        fontFamily: "var(--font-dm-sans), 'DM Sans', sans-serif",
+                        fontWeight: 300,
+                      }}
+                    >
+                      {order.email}
+                    </p>
+                  )}
                   <p
                     className="text-sm mt-1"
                     style={{
@@ -193,6 +218,9 @@ export default function OrdersPage() {
                     }}
                   >
                     {order.productType} · {order.quantity} Dozen
+                    {order.pricePerDozen > 0 && (
+                      <span className="ml-2">@ {formatCurrency(order.pricePerDozen)}/dozen</span>
+                    )}
                     {order.freeDelivery && (
                       <span
                         className="ml-2 text-xs px-2 py-0.5 rounded-full"
@@ -223,7 +251,7 @@ export default function OrdersPage() {
                       color: "var(--forest)",
                     }}
                   >
-                    ₹{order.totalAmount.toLocaleString("en-IN")}
+                    {formatCurrency(order.totalAmount)}
                   </p>
                   <p
                     className="text-xs uppercase"
@@ -235,6 +263,30 @@ export default function OrdersPage() {
                   >
                     {order.paymentMethod === "cod" ? "Cash on Delivery" : "Razorpay"}
                   </p>
+                  {order.orderId && (
+                    <p
+                      className="text-xs mt-1"
+                      style={{
+                        color: "var(--warm-grey)",
+                        fontFamily: "var(--font-dm-sans), 'DM Sans', sans-serif",
+                        fontWeight: 300,
+                      }}
+                    >
+                      Order ID: {order.orderId}
+                    </p>
+                  )}
+                  {order.paymentId && (
+                    <p
+                      className="text-xs mt-1"
+                      style={{
+                        color: "var(--warm-grey)",
+                        fontFamily: "var(--font-dm-sans), 'DM Sans', sans-serif",
+                        fontWeight: 300,
+                      }}
+                    >
+                      Payment ID: {order.paymentId}
+                    </p>
+                  )}
                   {order.razorpayPaymentLinkUrl && (
                     <a
                       href={order.razorpayPaymentLinkUrl}
@@ -265,6 +317,48 @@ export default function OrdersPage() {
                 </div>
               </div>
 
+              <div
+                className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4"
+                style={{ color: "var(--warm-grey)" }}
+              >
+                <div
+                  className="rounded-sm px-3 py-2"
+                  style={{ backgroundColor: "var(--ivory)" }}
+                >
+                  <p className="text-[10px] uppercase tracking-widest mb-1">Subtotal</p>
+                  <p className="text-sm" style={{ color: "var(--charcoal)" }}>
+                    {formatCurrency(order.subtotal || order.totalAmount)}
+                  </p>
+                </div>
+                <div
+                  className="rounded-sm px-3 py-2"
+                  style={{ backgroundColor: "var(--ivory)" }}
+                >
+                  <p className="text-[10px] uppercase tracking-widest mb-1">Tax</p>
+                  <p className="text-sm" style={{ color: "var(--charcoal)" }}>
+                    {formatCurrency(order.tax)}
+                  </p>
+                </div>
+                <div
+                  className="rounded-sm px-3 py-2"
+                  style={{ backgroundColor: "var(--ivory)" }}
+                >
+                  <p className="text-[10px] uppercase tracking-widest mb-1">Delivery</p>
+                  <p className="text-sm" style={{ color: "var(--charcoal)" }}>
+                    {formatCurrency(order.deliveryCharges)}
+                  </p>
+                </div>
+                <div
+                  className="rounded-sm px-3 py-2"
+                  style={{ backgroundColor: "var(--ivory)" }}
+                >
+                  <p className="text-[10px] uppercase tracking-widest mb-1">Distance</p>
+                  <p className="text-sm" style={{ color: "var(--charcoal)" }}>
+                    {order.distance > 0 ? `${order.distance.toFixed(2)} km` : "—"}
+                  </p>
+                </div>
+              </div>
+
               {/* Status controls */}
               <div
                 className="flex flex-wrap gap-6 pt-4 border-t"
@@ -282,6 +376,18 @@ export default function OrdersPage() {
                   >
                     Order Status
                   </label>
+                  {order.orderStatusLabel && (
+                    <p
+                      className="text-xs mb-1"
+                      style={{
+                        color: "var(--warm-grey)",
+                        fontFamily: "var(--font-dm-sans), 'DM Sans', sans-serif",
+                        fontWeight: 300,
+                      }}
+                    >
+                      Current source value: {order.orderStatusLabel}
+                    </p>
+                  )}
                   <div className="flex items-center gap-2">
                     <span
                       className="w-2 h-2 rounded-full inline-block"

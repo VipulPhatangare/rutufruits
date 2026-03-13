@@ -3,31 +3,45 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { Product } from "@/lib/models/Product";
 import { Contact } from "@/lib/models/Contact";
 import { Settings } from "@/lib/models/Settings";
+import { Pincode } from "@/lib/models/Pincode";
+import { DeliveryChargeRule } from "@/lib/models/DeliveryChargeRule";
 
 async function getDashboardStats() {
   try {
     await connectToDatabase();
-    const [productCount, newInquiries, settings] = await Promise.all([
+    const [productCount, newInquiries, settings, pincodeCount, deliveryRuleCount] = await Promise.all([
       Product.countDocuments(),
       Contact.countDocuments({ status: "new" }),
       Settings.findOne().lean(),
+      Pincode.countDocuments({ enabled: true }),
+      DeliveryChargeRule.countDocuments({ enabled: true }),
     ]);
     return {
       productCount,
       newInquiries,
+      pincodeCount,
+      deliveryRuleCount,
       whatsappNumber: (settings as { whatsappNumber?: string } | null)?.whatsappNumber || "Not configured",
     };
   } catch {
-    return { productCount: 0, newInquiries: 0, whatsappNumber: "DB not connected" };
+    return {
+      productCount: 0,
+      newInquiries: 0,
+      pincodeCount: 0,
+      deliveryRuleCount: 0,
+      whatsappNumber: "DB not connected",
+    };
   }
 }
 
 export default async function AdminDashboardPage() {
-  const { productCount, newInquiries, whatsappNumber } = await getDashboardStats();
+  const { productCount, newInquiries, pincodeCount, deliveryRuleCount, whatsappNumber } = await getDashboardStats();
 
   const stats = [
     { label: "Products Listed", value: productCount, href: "/admin/products" },
     { label: "New Inquiries", value: newInquiries, href: "/admin/contacts" },
+    { label: "Active Pincodes", value: pincodeCount, href: "/admin/pincodes" },
+    { label: "Delivery Rules", value: deliveryRuleCount, href: "/admin/delivery-charges" },
     {
       label: "WhatsApp Number",
       value: whatsappNumber.startsWith("91") ? `+${whatsappNumber}` : whatsappNumber,
@@ -58,7 +72,7 @@ export default async function AdminDashboardPage() {
       </p>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4 mb-10">
         {stats.map((stat) => (
           <Link
             key={stat.label}
@@ -105,9 +119,11 @@ export default async function AdminDashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {[
           { href: "/admin/products", label: "Edit Products", icon: "🥭" },
+          { href: "/admin/pincodes", label: "Manage Pincodes", icon: "📍" },
+          { href: "/admin/delivery-charges", label: "Delivery Pricing", icon: "🚚" },
           { href: "/admin/settings", label: "WhatsApp Settings", icon: "💬" },
           { href: "/admin/contacts", label: "View Inquiries", icon: "📬" },
-          { href: "/", label: "View Live Site", icon: "🌐" },
+          { href: "/admin/orders", label: "Review Orders", icon: "📦" },
         ].map((action) => (
           <Link
             key={action.href}

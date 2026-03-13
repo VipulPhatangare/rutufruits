@@ -8,6 +8,8 @@ const navItems = [
   { href: "/admin", label: "Dashboard", icon: "🏠" },
   { href: "/admin/products", label: "Products", icon: "🥭" },
   { href: "/admin/orders", label: "Orders", icon: "📦" },
+  { href: "/admin/pincodes", label: "Pincodes", icon: "📍" },
+  { href: "/admin/delivery-charges", label: "Delivery Charges", icon: "🚚" },
   { href: "/admin/settings", label: "WhatsApp", icon: "💬" },
   { href: "/admin/contacts", label: "Inquiries", icon: "📬" },
   { href: "/admin/razorpay", label: "Payment Links", icon: "💳" },
