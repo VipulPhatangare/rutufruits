@@ -45,6 +45,7 @@ type RawOrderDocument = {
         isOrderPlace?: unknown;
         isWantOrder?: unknown;
         isPaymentDone?: unknown;
+        delivery_status?: unknown;
       };
   freeDelivery?: unknown;
   razorpayPaymentLinkUrl?: unknown;
@@ -53,6 +54,7 @@ type RawOrderDocument = {
 
 type AdminOrderStatus = "new" | "confirmed" | "dispatched" | "delivered" | "cancelled";
 type AdminPaymentStatus = "pending" | "paid" | "failed";
+type AdminDeliveryStatus = "pending" | "dispatched" | "delivered" | "failed";
 
 function getNumber(value: unknown, fallback = 0) {
   const parsed = Number(value);
@@ -91,6 +93,18 @@ function normalizePaymentStatus(order: RawOrderDocument): AdminPaymentStatus {
 
   if (order.payment?.paymentCompleted === true) return "paid";
   if (order.payment?.paymentStarted === true) return "pending";
+
+  return "pending";
+}
+
+// Reads exclusively from orderStatus.delivery_status
+function normalizeDeliveryStatus(doc: RawOrderDocument): AdminDeliveryStatus {
+  const valid: AdminDeliveryStatus[] = ["pending", "dispatched", "delivered", "failed"];
+
+  if (typeof doc.orderStatus === "object" && doc.orderStatus !== null && "delivery_status" in doc.orderStatus) {
+    const ds = String((doc.orderStatus as { delivery_status?: unknown }).delivery_status ?? "").trim().toLowerCase();
+    if (valid.includes(ds as AdminDeliveryStatus)) return ds as AdminDeliveryStatus;
+  }
 
   return "pending";
 }
@@ -160,6 +174,7 @@ function normalizeOrder(doc: RawOrderDocument) {
     paymentStatus: normalizedPaymentStatus,
     orderStatus: normalizedOrderStatus,
     orderStatusLabel: typeof rawNestedStatus === "string" ? rawNestedStatus : capitalizeStatus(normalizedOrderStatus),
+    deliveryStatus: normalizeDeliveryStatus(doc),
     freeDelivery: Boolean(doc.freeDelivery),
     razorpayPaymentLinkUrl:
       getString(doc.razorpayPaymentLinkUrl) || getString(doc.payment?.payment_link),
@@ -265,18 +280,22 @@ export async function PATCH(request: NextRequest) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
-    const { orderId, orderStatus, paymentStatus } = await request.json();
+    const { orderId, orderStatus, paymentStatus, deliveryStatus } = await request.json();
     if (!orderId) return NextResponse.json({ error: "Missing orderId" }, { status: 400 });
 
     const validOrderStatus = ["new", "confirmed", "dispatched", "delivered", "cancelled"];
     const validPaymentStatus = ["pending", "paid", "failed"];
+    const validDeliveryStatus = ["pending", "dispatched", "delivered", "failed"];
 
-    const update: Record<string, string> = {};
+    const update: Record<string, unknown> = {};
     if (orderStatus && validOrderStatus.includes(orderStatus)) {
       Object.assign(update, buildOrderStatusUpdate(orderStatus));
     }
     if (paymentStatus && validPaymentStatus.includes(paymentStatus)) {
       Object.assign(update, buildPaymentStatusUpdate(paymentStatus));
+    }
+    if (deliveryStatus && validDeliveryStatus.includes(deliveryStatus)) {
+      update["orderStatus.delivery_status"] = deliveryStatus;
     }
 
     await connectToDatabase();
